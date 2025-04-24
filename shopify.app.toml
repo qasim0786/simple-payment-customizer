@@ -1,0 +1,37 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "6caadcc6737d45f52c3ff343ff1ffa4e"
+name = "Simple-Payment-Customizer"
+handle = "simple-payment-customizer"
+application_url = "https://dim-converted-chronic-requests.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+dev_store_url = "qasimxpro2.myshopify.com"
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_payment_terms,read_orders,write_payment_customizations"
+
+[auth]
+redirect_urls = [
+  "https://dim-converted-chronic-requests.trycloudflare.com/auth/callback",
+  "https://dim-converted-chronic-requests.trycloudflare.com/auth/shopify/callback",
+  "https://dim-converted-chronic-requests.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = false

@@ -1,0 +1,22 @@
+query RunInput {
+  paymentMethods {
+    id
+    name
+  }
+  shopDomain: paymentCustomization {
+    metafield(key: "my-added-value") {
+      value
+      type
+    }
+  }
+
+  shop {
+    metafield(namespace: "paymentCustomization", key: "payment-added-value") {
+      value
+      type
+    }
+  }
+
+}
+
+ 
