@@ -42,11 +42,14 @@ export const action: ActionFunction = async ({ request }) => {
             create: { ...payload, isActive: true },
         });
 
-        // Step 1: Fetch shop ID from Shopify
+        // Step 1: Fetch shop ID and check existing metafield
         const shopQuery = `
       query {
         shop {
           id
+          metafield(namespace: "paymentCustomization", key: "payment-added-value") {
+            id
+          }
         }
       }
     `;
@@ -56,46 +59,79 @@ export const action: ActionFunction = async ({ request }) => {
             shopQuery
         );
         const shopId = shopInfo.shop.id;
+        const existingMetafieldId = shopInfo.shop.metafield?.id;
 
-        // Step 2: Store JSON to metafield
-        const mutation = `
-      mutation SetMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
-        metafieldsSet(metafields: $metafieldsSetInput) {
-          metafields {
-            id
-            key
-            namespace
-            value
-            type
-          }
-          userErrors {
-            field
-            message
+        let mutation;
+        let variables;
+
+        if (existingMetafieldId) {
+            // Update existing metafield
+            mutation = `
+        mutation MetafieldUpdate($input: MetafieldInput!) {
+          metafieldUpdate(input: $input) {
+            metafield {
+              id
+              key
+              namespace
+              value
+            }
+            userErrors {
+              field
+              message
+            }
           }
         }
-      }
-    `;
+      `;
 
-        const variables = {
-            metafieldsSetInput: [
-                {
-                    namespace: "paymentCustomization",
-                    key: "payment-added-value",
-                    type: "json",
+            variables = {
+                input: {
+                    id: existingMetafieldId,
                     value: JSON.stringify(paymentMethods),
-                    ownerId: shopId,
                 },
-            ],
-        };
+            };
+        } else {
+            // Create new metafield
+            mutation = `
+        mutation SetMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
+          metafieldsSet(metafields: $metafieldsSetInput) {
+            metafields {
+              id
+              key
+              namespace
+              value
+              type
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+
+            variables = {
+                metafieldsSetInput: [
+                    {
+                        namespace: "paymentCustomization",
+                        key: "payment-added-value",
+                        type: "json",
+                        value: JSON.stringify(paymentMethods),
+                        ownerId: shopId,
+                    },
+                ],
+            };
+        }
 
         const result = await graphqlRequest(
             { shop, accessToken },
             mutation,
             variables
         );
-        console.log('result1', result?.metafieldsSet?.metafields);
 
-        const errors = result?.metafieldsSet?.userErrors;
+        const errors = existingMetafieldId
+            ? result?.metafieldUpdate?.userErrors
+            : result?.metafieldsSet?.userErrors;
+
         if (errors?.length) {
             return json({ success: false, message: errors[0].message }, { status: 500 });
         }

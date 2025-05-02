@@ -9,7 +9,8 @@ import {
   Button,
   Banner,
   Spinner,
-  Icon
+  Icon,
+  List,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useEffect, useState } from "react";
@@ -110,9 +111,16 @@ export default function PaymentCustomizationPage() {
 
   const handleActivate = async () => {
     setLoading(true);
-    await fetch("/app/api/activation_status", { method: "POST" });
-    setIsActive(true);
-    setLoading(false);
+    if(isActive){
+      await fetch("/api/deactivate_customization", { method: "POST" });
+      setIsActive(false);
+      setLoading(false);
+    }else{
+      await fetch("/api/activate_customization", { method: "POST" });
+      setIsActive(true);
+      setLoading(false);
+    }
+
   };
 
   if (loading) {
@@ -149,6 +157,26 @@ export default function PaymentCustomizationPage() {
                 <Button onClick={handleActivate} variant="primary">
                   Activate
                 </Button>
+                <List type="number">
+                  <List.Item>
+                    Install the app and navigate to the main dashboard
+                  </List.Item>
+                  <List.Item>
+                    Enable the Payment Customization function on your store
+                  </List.Item>
+                  <List.Item>
+                    Open the Payment Section in new Tab
+                  </List.Item>
+                  <List.Item>
+                    Copy Payment Method Names from the Payment Section
+                  </List.Item>
+                  <List.Item>
+                    Paste them in order of priority (1 = highest priority, increasing numbers = lower priority)
+                  </List.Item>
+                  <List.Item>
+                    Save your settings
+                  </List.Item>
+                </List>
               </BlockStack>
             </Card>
           </Layout.Section>
@@ -197,6 +225,26 @@ export default function PaymentCustomizationPage() {
                 <Button onClick={handleSave} disabled={!!error} variant="primary">
                   Save Priorities
                 </Button>
+                <List type="number">
+                  <List.Item>
+                    Install the app and navigate to the main dashboard
+                  </List.Item>
+                  <List.Item>
+                    Enable the Payment Customization function on your store
+                  </List.Item>
+                  <List.Item>
+                    Open the Payment Section in new Tab
+                  </List.Item>
+                  <List.Item>
+                    Copy Payment Method Names from the Payment Section
+                  </List.Item>
+                  <List.Item>
+                    Paste them in order of priority (1 = highest priority, increasing numbers = lower priority)
+                  </List.Item>
+                  <List.Item>
+                    Save your settings
+                  </List.Item>
+                </List>
               </BlockStack>
             </Card>
           </Layout.Section>

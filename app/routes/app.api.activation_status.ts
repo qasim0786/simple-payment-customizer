@@ -95,6 +95,8 @@ export const action: ActionFunction = async ({ request }) => {
 
   // Step 3: Mark DB as active
   const existing = await prisma.paymentCustomizationStatus.findUnique({ where: { shop } });
+  console.log(existing);
+
 
   if (existing) {
     await prisma.paymentCustomizationStatus.update({
@@ -103,7 +105,7 @@ export const action: ActionFunction = async ({ request }) => {
     });
   } else {
     await prisma.paymentCustomizationStatus.create({
-      data: { shop, isActive: true },
+      data: { id: functionId, shop, isActive: true },
     });
   }
 

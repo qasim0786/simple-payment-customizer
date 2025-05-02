@@ -3,7 +3,7 @@
 client_id = "6caadcc6737d45f52c3ff343ff1ffa4e"
 name = "Simple-Payment-Customizer"
 handle = "simple-payment-customizer"
-application_url = "https://dim-converted-chronic-requests.trycloudflare.com"
+application_url = "https://efficiently-bullet-workplace-disabled.trycloudflare.com"
 embedded = true
 
 [build]
@@ -28,9 +28,9 @@ scopes = "read_payment_terms,read_orders,write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://dim-converted-chronic-requests.trycloudflare.com/auth/callback",
-  "https://dim-converted-chronic-requests.trycloudflare.com/auth/shopify/callback",
-  "https://dim-converted-chronic-requests.trycloudflare.com/api/auth/callback"
+  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/auth/callback",
+  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/auth/shopify/callback",
+  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
