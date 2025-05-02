@@ -1,36 +1,28 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "6caadcc6737d45f52c3ff343ff1ffa4e"
-name = "Simple-Payment-Customizer"
-handle = "simple-payment-customizer"
-application_url = "https://efficiently-bullet-workplace-disabled.trycloudflare.com"
+client_id = "a7359ecf8d8d5f14d81fa3c9e85cbe81"
+application_url = "https://stainless-edward-anybody-conservation.trycloudflare.com"
 embedded = true
+name = "simple-payment-customizer"
+handle = "simple-payment-customizer-2"
 
 [build]
 include_config_on_deploy = true
-dev_store_url = "qasimxpro2.myshopify.com"
+dev_store_url = "simple-payment-customizer.myshopify.com"
 automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-04"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
-
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/app/scopes_update"
-
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_payment_terms,read_orders,write_payment_customizations"
+scopes = "read_orders,read_payment_terms,write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/auth/callback",
-  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/auth/shopify/callback",
-  "https://efficiently-bullet-workplace-disabled.trycloudflare.com/api/auth/callback"
+  "https://stainless-edward-anybody-conservation.trycloudflare.com/auth/callback",
+  "https://stainless-edward-anybody-conservation.trycloudflare.com/auth/shopify/callback",
+  "https://stainless-edward-anybody-conservation.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

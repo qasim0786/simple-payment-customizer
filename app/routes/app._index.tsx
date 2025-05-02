@@ -11,6 +11,7 @@ import {
   Spinner,
   Icon,
   List,
+  Badge
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useEffect, useState } from "react";
@@ -20,6 +21,8 @@ export default function PaymentCustomizationPage() {
   const [methods, setMethods] = useState<{ id: string; name: string; priority: number }[]>([]);
   const [isActive, setIsActive] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -87,6 +90,7 @@ export default function PaymentCustomizationPage() {
 
   const handleSave = async () => {
     if (error) return;
+    setButtonLoading(true);
     const payload = {
       paymentMethods: methods.map(({ name, priority }) => ({
         name,
@@ -101,39 +105,57 @@ export default function PaymentCustomizationPage() {
     });
 
     const data = await res.json();
+
     if (!data.success) {
       setError(data.message || "Failed to save priorities.");
+      setSaveSuccess(false);
     } else {
       setError(null);
-      alert("Saved successfully!");
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000); // Hide after 4s
     }
+    setButtonLoading(false);
   };
-
   const handleActivate = async () => {
     setLoading(true);
-    if(isActive){
-      await fetch("/api/deactivate_customization", { method: "POST" });
-      setIsActive(false);
-      setLoading(false);
-    }else{
-      await fetch("/api/activate_customization", { method: "POST" });
-      setIsActive(true);
+    setError(""); // optional: reset error state if you're tracking errors
+  
+    try {
+      const url = isActive ? "/api/deactivate_customization" : "/api/activate_customization";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const data = await response.json(); // 🔑 this actually reads the body
+  
+      console.log("API response:", data);
+  
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unknown error from server");
+      }
+  
+      setIsActive(!isActive);
+    } catch (error: any) {
+      console.error("Error toggling customization:", error);
+      setError(error.message || "Something went wrong"); // optional: show error in UI
+    } finally {
       setLoading(false);
     }
-
   };
+  
 
   if (loading) {
     return (
-      <Page>
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <Spinner accessibilityLabel="Loading" size="large" />
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </Page>
+<Page>
+  <Layout>
+    <Layout.Section>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+        <Spinner accessibilityLabel="Loading" size="large" />
+      </div>
+    </Layout.Section>
+  </Layout>
+</Page>
     );
   }
 
@@ -184,6 +206,9 @@ export default function PaymentCustomizationPage() {
           <Layout.Section>
             <Card padding="400">
               <BlockStack gap="300">
+                <Card>
+                <Badge tone="success">Active</Badge>
+                </Card>
                 <Text as="h2" variant="headingMd">
                   Add Payment Method Priorities
                 </Text>
@@ -222,9 +247,22 @@ export default function PaymentCustomizationPage() {
                   </Banner>
                 )}
 
-                <Button onClick={handleSave} disabled={!!error} variant="primary">
-                  Save Priorities
-                </Button>
+<Button
+  onClick={handleSave}
+  disabled={!!error}
+  variant="primary"
+  loading={buttonLoading}
+>
+  Save Priorities
+</Button>
+
+{saveSuccess && (
+  <Banner tone="success">
+    <Text as="p" variant="bodyMd">
+      Payment method priorities saved successfully.
+    </Text>
+  </Banner>
+)}
                 <List type="number">
                   <List.Item>
                     Install the app and navigate to the main dashboard

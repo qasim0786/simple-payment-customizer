@@ -22,15 +22,12 @@ export const action: ActionFunction = async ({ request }) => {
         }
 
         for (const method of paymentMethods) {
-            if (
-                typeof method.name !== "string" ||
-                typeof method.priority !== "number"
-            ) {
+            if (typeof method.name !== "string" || typeof method.priority !== "number") {
                 return json({ success: false, message: "Invalid method format" }, { status: 400 });
             }
         }
 
-        // Save locally in your database
+        // Save locally in the database
         const payload = {
             shop,
             paymentMethod: JSON.stringify(paymentMethods),
@@ -42,7 +39,7 @@ export const action: ActionFunction = async ({ request }) => {
             create: { ...payload, isActive: true },
         });
 
-        // Step 1: Fetch shop ID and check existing metafield
+        // Fetch shop ID and check existing metafield
         const shopQuery = `
       query {
         shop {
@@ -54,83 +51,44 @@ export const action: ActionFunction = async ({ request }) => {
       }
     `;
 
-        const shopInfo = await graphqlRequest(
-            { shop, accessToken },
-            shopQuery
-        );
+        const shopInfo = await graphqlRequest({ shop, accessToken }, shopQuery);
         const shopId = shopInfo.shop.id;
         const existingMetafieldId = shopInfo.shop.metafield?.id;
 
-        let mutation;
-        let variables;
-
-        if (existingMetafieldId) {
-            // Update existing metafield
-            mutation = `
-        mutation MetafieldUpdate($input: MetafieldInput!) {
-          metafieldUpdate(input: $input) {
-            metafield {
-              id
-              key
-              namespace
-              value
-            }
-            userErrors {
-              field
-              message
-            }
+        // Use only metafieldsSet (valid for both create & update)
+        const mutation = `
+      mutation SetMetafield($metafields: [MetafieldsSetInput!]!) {
+        metafieldsSet(metafields: $metafields) {
+          metafields {
+            id
+            key
+            namespace
+            value
+            type
+          }
+          userErrors {
+            field
+            message
           }
         }
-      `;
+      }
+    `;
 
-            variables = {
-                input: {
-                    id: existingMetafieldId,
+        const variables = {
+            metafields: [
+                {
+
+                    namespace: "paymentCustomization",
+                    key: "payment-added-value",
+                    type: "json",
                     value: JSON.stringify(paymentMethods),
+                    ownerId: shopId,
                 },
-            };
-        } else {
-            // Create new metafield
-            mutation = `
-        mutation SetMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
-          metafieldsSet(metafields: $metafieldsSetInput) {
-            metafields {
-              id
-              key
-              namespace
-              value
-              type
-            }
-            userErrors {
-              field
-              message
-            }
-          }
-        }
-      `;
+            ],
+        };
 
-            variables = {
-                metafieldsSetInput: [
-                    {
-                        namespace: "paymentCustomization",
-                        key: "payment-added-value",
-                        type: "json",
-                        value: JSON.stringify(paymentMethods),
-                        ownerId: shopId,
-                    },
-                ],
-            };
-        }
-
-        const result = await graphqlRequest(
-            { shop, accessToken },
-            mutation,
-            variables
-        );
-
-        const errors = existingMetafieldId
-            ? result?.metafieldUpdate?.userErrors
-            : result?.metafieldsSet?.userErrors;
+        const result = await graphqlRequest({ shop, accessToken }, mutation, variables);
+        const errors = result?.metafieldsSet?.userErrors;
 
         if (errors?.length) {
             return json({ success: false, message: errors[0].message }, { status: 500 });
