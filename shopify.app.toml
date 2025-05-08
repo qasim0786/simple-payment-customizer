@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "a7359ecf8d8d5f14d81fa3c9e85cbe81"
-application_url = "https://stainless-edward-anybody-conservation.trycloudflare.com"
+application_url = "https://simple-payment-customizer.onrender.com"
 embedded = true
 name = "simple-payment-customizer"
 handle = "simple-payment-customizer-2"
@@ -20,9 +20,9 @@ scopes = "read_orders,read_payment_terms,write_payment_customizations"
 
 [auth]
 redirect_urls = [
-  "https://stainless-edward-anybody-conservation.trycloudflare.com/auth/callback",
-  "https://stainless-edward-anybody-conservation.trycloudflare.com/auth/shopify/callback",
-  "https://stainless-edward-anybody-conservation.trycloudflare.com/api/auth/callback"
+  "https://simple-payment-customizer.onrender.com/auth/callback",
+  "https://simple-payment-customizer.onrender.com/auth/shopify/callback",
+  "https://simple-payment-customizer.onrender.com/api/auth/callback"
 ]
 
 [pos]
